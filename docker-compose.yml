@@ -1,30 +1,53 @@
 version: '3'
 
 services:
-  manager:
-    build:
-      context: manager
-      dockerfile: Dockerfile
-    ports:
-      - "8085:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    networks:
-      - crackhash
+  mongo1-rep:
+        ports:
+            - '27017:27017'
+        restart: always
+        logging:
+            options:
+                max-size: 1g
+        # environment:
+        #     - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+        #     - MONGO_INITDB_ROOT_PASSWORD=bdung
+        image: mongo
+  mongo2-rep:
+        ports:
+            - '27018:27017'
+        restart: always
+        logging:
+            options:
+                max-size: 1g
+        # environment:
+        #     - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+        #     - MONGO_INITDB_ROOT_PASSWORD=bdung
+        image: mongo      
 
   worker:
     build:
       context: worker
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      - manager
-    networks:
-      - crackhash
+    # depends_on:
+    #   - manager
+    # networks:
+    #   - crackhash
 
-networks:
-  crackhash:
-    driver: bridge
+  # manager:
+  #   build:
+  #     context: manager
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8085:8080"
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: docker
+  #   networks:
+  #     - crackhash
+
+# networks:
+#   crackhash:
+#     driver: bridge
