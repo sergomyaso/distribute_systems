@@ -1,6 +1,11 @@
 package ru.nsu.manager.model
 
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
+
+@Document("Requests")
 data class RequestStatus(
+    @Id
     val requestId: String,
     val partsCount: Int,
     val startTime: Long = System.currentTimeMillis(),

@@ -16,6 +16,7 @@ import ru.nsu.manager.dto.CrackRequest
 import ru.nsu.manager.model.RequestStatus
 import ru.nsu.manager.model.Status
 import java.io.ByteArrayInputStream
+import ru.nsu.manager.repository.RequestRepository
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -26,39 +27,43 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class CrackHashServiceImpl @Autowired constructor(
     private val rabbitConn: Connection,
     private val workerQueue: RabbitQueue,
+    private val requestRepository: RequestRepository
 ) : CrackHashService {
     private val restTemplate: RestTemplate = RestTemplate()
     private val requestStatuses: ConcurrentHashMap<String, RequestStatus> = ConcurrentHashMap()
     private val queueWorkerResp: ConcurrentLinkedQueue<CrackHashWorkerResponse> = ConcurrentLinkedQueue()
+
     val logger: Logger? = LoggerFactory.getLogger(CrackHashServiceImpl::class.java)
     val WORKER_EXCHANGE = "worker_exchange"
     val MANAGE_EXCHANGE = "manager_exchange"
 
     init {
-            rabbitConn.createChannel().use {
-                val deliverCallback = DeliverCallback { consumerTag: String?, delivery: Delivery? ->
-                    val message = delivery?.body?.let { String(it, Charsets.UTF_8) }
-                    println("Received '$message'")
+        rabbitConn.createChannel().use {
+            val deliverCallback = DeliverCallback { consumerTag: String?, delivery: Delivery? ->
+                val message = delivery?.body?.let { String(it, Charsets.UTF_8) }
+                println("Received '$message'")
 
-                    val jaxbContext = JAXBContext.newInstance(CrackHashWorkerResponse::class.java)
-                    val unmarshaller = jaxbContext.createUnmarshaller()
-                    val resp: CrackHashWorkerResponse;
-                    if (message != null) {
-                        resp =
-                            unmarshaller.unmarshal(ByteArrayInputStream(message.toByteArray())) as CrackHashWorkerResponse
-                        queueWorkerResp.add(resp);
-                    }
-                    it.basicAck(delivery?.envelope?.deliveryTag ?: 0, false)
+                val jaxbContext = JAXBContext.newInstance(CrackHashWorkerResponse::class.java)
+                val unmarshaller = jaxbContext.createUnmarshaller()
+                val resp: CrackHashWorkerResponse;
+                if (message != null) {
+                    resp =
+                        unmarshaller.unmarshal(ByteArrayInputStream(message.toByteArray())) as CrackHashWorkerResponse
+                    queueWorkerResp.add(resp);
                 }
-
-                it.basicConsume(workerQueue.queueName, false, deliverCallback, CancelCallback { })
+                it.basicAck(delivery?.envelope?.deliveryTag ?: 0, false)
             }
+
+            it.basicConsume(workerQueue.queueName, false, deliverCallback, CancelCallback { })
+        }
     }
 
     override fun createTask(request: CrackRequest): String {
         val requestId: String = UUID.randomUUID().toString()
         val requestStatus = RequestStatus(requestId = requestId, partsCount = WORKERS)
         requestStatuses[requestId] = requestStatus
+        println(requestId)
+        requestRepository.save(requestStatus)
         sendTasksToWorkers(request, requestId)
         return requestId
     }
@@ -75,7 +80,6 @@ class CrackHashServiceImpl @Autowired constructor(
             requestToWorker.alphabet = alphabet
             requestToWorker.partCount = WORKERS
             requestToWorker.partNumber = worker
-
             sendTaskToManagerQueue(requestToWorker)
 
 //            val httpEntity: HttpEntity<CrackHashManagerRequest> = HttpEntity(requestToWorker)
