@@ -30,6 +30,7 @@ dependencies {
     jaxb('org.glassfish.jaxb:jaxb-runtime:3.0.0-M5') // без етого не работаетœ
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation 'com.rabbitmq:amqp-client:5.9.0'
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

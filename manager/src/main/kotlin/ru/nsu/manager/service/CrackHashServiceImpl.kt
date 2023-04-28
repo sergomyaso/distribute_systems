@@ -35,13 +35,6 @@ class CrackHashServiceImpl @Autowired constructor(
     val MANAGE_EXCHANGE = "manager_exchange"
 
     init {
-
-        val deliverCallback = DeliverCallback { consumerTag: String?, delivery: Delivery? ->
-            val message = delivery?.body?.let { String(it, Charsets.UTF_8) }
-            println("Received '$message'")
-
-            // обработка полученного сообщения
-            // ...
             rabbitConn.createChannel().use {
                 val deliverCallback = DeliverCallback { consumerTag: String?, delivery: Delivery? ->
                     val message = delivery?.body?.let { String(it, Charsets.UTF_8) }
@@ -60,7 +53,6 @@ class CrackHashServiceImpl @Autowired constructor(
 
                 it.basicConsume(workerQueue.queueName, false, deliverCallback, CancelCallback { })
             }
-        }
     }
 
     override fun createTask(request: CrackRequest): String {

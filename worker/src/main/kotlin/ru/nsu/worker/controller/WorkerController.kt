@@ -1,5 +1,6 @@
 package ru.nsu.worker.controller
 
+import com.rabbitmq.client.Connection
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.JAXBException
 import jakarta.xml.bind.Marshaller
@@ -7,9 +8,12 @@ import org.paukov.combinatorics.CombinatoricsFactory
 import org.paukov.combinatorics.Generator
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 import ru.nsu.ccfit.schema.crack_hash_response.CrackHashManagerRequest
 import ru.nsu.ccfit.schema.crack_hash_response.CrackHashWorkerResponse
 import ru.nsu.ccfit.schema.crack_hash_response.CrackHashWorkerResponse.Answers
+import ru.nsu.worker.configrutaions.RabbitQueue
 import java.io.IOException
 import java.io.StringWriter
 import java.math.BigInteger
@@ -26,10 +31,14 @@ import java.util.concurrent.Executors
 import kotlin.math.ceil
 import kotlin.math.pow
 
-
+@EnableAutoConfiguration
 @RestController
 @RequestMapping("/internal/api/worker/hash/crack")
-class WorkerController {
+class WorkerController @Autowired constructor(
+    private val rabbitConn: Connection,
+    private val workerQueue: RabbitQueue,
+    ) {
+
     private val restTemplate = RestTemplateBuilder()
         .rootUri("http://manager:8080")
         .requestFactory(HttpComponentsClientHttpRequestFactory::class.java)
@@ -106,6 +115,13 @@ class WorkerController {
             wordSpace += alphabetSize.toDouble().pow(i.toDouble()).toLong()
         }
         return wordSpace
+    }
+
+    @Scheduled(fixedRate = 30)
+    fun checkQueueWorkerResponses() {
+        if (.size > 0) {
+            submitHashes(queueWorkerResp.poll())
+        }
     }
 
     private fun generateWords(startIdx: Long, endIdx: Long, maxWordLength: Int, alphabet: List<String>): List<String> {
