@@ -6,7 +6,7 @@ services:
             - '27017:27017'
         restart: always
         logging:
-            options:
+            options:  
                 max-size: 1g
         # environment:
         #     - MONGO_INITDB_ROOT_USERNAME=mongoadmin
@@ -23,31 +23,37 @@ services:
         #     - MONGO_INITDB_ROOT_USERNAME=mongoadmin
         #     - MONGO_INITDB_ROOT_PASSWORD=bdung
         image: mongo      
+  rabbit:
+        ports:
+            - '1567:567'
+        restart: always
+        image: rabbitmq:3.10.7-management   
 
-  worker:
+  worker1:
     build:
       context: worker
       dockerfile: Dockerfile
     ports:
-      - "8082:8080"
+      - "8082:8090"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-    # depends_on:
-    #   - manager
-    # networks:
-    #   - crackhash
+    depends_on:
+      - manager
 
-  # manager:
-  #   build:
-  #     context: manager
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8085:8080"
-  #   environment:
-  #     SPRING_PROFILES_ACTIVE: docker
-  #   networks:
-  #     - crackhash
+  worker2:
+    build:
+      context: worker
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8090"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - manager
 
-# networks:
-#   crackhash:
-#     driver: bridge
+  manager:
+    build:
+      context: manager
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8080"

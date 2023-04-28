@@ -25,7 +25,7 @@ class RabbitConfiguration {
 
     init {
         val factory = ConnectionFactory()
-        rabbitConn = factory.newConnection("amqp://guest:guest@localhost:5672/")
+        rabbitConn = factory.newConnection("amqp://guest:guest@rabbit:15672/")
 
 
         // задекларировали обменники, если их там нет (если есть не гаркнет)

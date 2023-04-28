@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5d8567f8-0738-4acc-8a82-5384714c7482" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../manager/src/main/kotlin/ru/nsu/manager/repository/RequestRepository.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../manager/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../manager/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../manager/src/main/kotlin/ru/nsu/manager/model/RequestStatus.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../manager/src/main/kotlin/ru/nsu/manager/model/RequestStatus.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../manager/src/main/kotlin/ru/nsu/manager/service/CrackHashServiceImpl.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../manager/src/main/kotlin/ru/nsu/manager/service/CrackHashServiceImpl.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../manager/src/main/kotlin/ru/nsu/manager/configrutaions/RabbitConfiguration.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../manager/src/main/kotlin/ru/nsu/manager/configrutaions/RabbitConfiguration.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/nsu/worker/configrutaions/RabbitConfiguration.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/nsu/worker/configrutaions/RabbitConfiguration.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +36,7 @@
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "Rebasing mongo",
+    "git-widget-placeholder": "master",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
