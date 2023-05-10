@@ -105,7 +105,11 @@ class CrackHashServiceImpl @Autowired constructor(
 //        val jaxbContext = JAXBContext.newInstance(CrackHashWorkerResponse::class.java)
 //        val marshaller = jaxbContext.createMarshaller()
 //
-        rabbitConn.createChannel().basicPublish(MANAGE_EXCHANGE, "", null, req.toString().toByteArray())
+        try {
+            rabbitConn.createChannel().basicPublish(MANAGE_EXCHANGE, "", null, req.toString().toByteArray())
+        } catch (e: Exception) {
+            // toodo
+        }
     }
 
     @Scheduled(fixedRate = 30)
