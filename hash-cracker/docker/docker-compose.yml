@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+
+  manager:
+    container_name: manager
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE: manager
+        SERVICE_PORT: 8080
+    environment:
+      ALPHABET: "abcdefghijklmnopqrstuvwxyz1234567890"
+      PART_COUNT: "16"
+      TASK_TIMEOUT: "10M"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  worker:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE: worker
+    environment:
+      TASK_TIMEOUT: "10M"
+    deploy:
+      replicas: 3
+    depends_on:
+      - rabbitmq
+
+  mongodb:
+    image: mongo:4
+    entrypoint: [ "/usr/bin/mongod", "--replSet", "rsmongo", "--bind_ip_all", "--wiredTigerCacheSizeGB", "1", "--quiet", "--logpath", "/dev/null"]
+    deploy:
+      replicas: 3
+
+  mongosetup:
+    build:
+      dockerfile: Dockerfile.init-mongo
+    depends_on:
+        - mongodb
+
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3.8-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+    ports:
+      - "15672:15672"
